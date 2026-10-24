@@ -27,3 +27,8 @@ instead. Observed with flyconn 0.4.0 from PyPI, 2026-10-24.
 7. **Writing a test store needs `flyconn.data.convert.common`** (`write_parquet`,
    `write_provenance`), which is not documented as public. flyconn-bench's fixture uses it like
    flyconn's own tests do. *Suggestion:* `flyconn.testing.write_synthetic_store(path, ...)`.
+8. **FlyWire licence in the registry.** `flywire-630.yaml` / `flywire-783.yaml` say `CC-BY-4.0`,
+   but flywire.ai/guidelines and the FlyWire Principles say the public release is
+   **CC BY-NC 4.0** (only the Zenodo deposit says CC BY 4.0). See `docs/licences.md`. flyconn's
+   `DATA_SOURCES.md` marks the FlyWire ToS as UNVERIFIED; this resolves part of that.
+   *Suggestion:* record both statements in the registry until FlyWire clarifies.

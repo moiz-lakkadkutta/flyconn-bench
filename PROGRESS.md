@@ -24,6 +24,10 @@ Done:
 - Docs: `docs/licences.md` (upload gate), `docs/flyconn-adr-draft.md` (ADR to copy into flyconn
   once the owner approves), `docs/upstream-notes.md` (flyconn API friction).
 
+Licences (`docs/licences.md`, read 2026-10-24): MaleCNS v1.0 and BANC v888 **cleared**
+(CC BY 4.0); FlyWire **blocked** (Zenodo says CC BY 4.0, flywire.ai says CC BY-NC 4.0);
+hemibrain and MANC **review** (CC BY 4.0 at source, open ambiguities listed).
+
 Decisions taken in this session (owner can override):
 - Snapshots first; the benchmark (M2+) later (owner, 2026-10-24).
 - The snapshot edge table is flyconn's neuron-to-neuron `edges` (MaleCNS: 25,582,938 edges of
