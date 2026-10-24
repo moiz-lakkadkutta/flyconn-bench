@@ -162,6 +162,29 @@ def _kv_lines(d: Mapping[str, Any], indent: str = "") -> list[str]:
     return lines
 
 
+FILL_COLUMNS: tuple[str, ...] = (
+    "cell_type",
+    "nt_pred",
+    "nt_conf",
+    "nt_known",
+    "fafb_783_cell_type",
+    "hemibrain_121_cell_type",
+    "manc_121_cell_type",
+    "malecns_10_cell_type",
+)
+
+
+def _fill_lines(fill: Mapping[str, int]) -> list[str]:
+    rows = fill.get("rows")
+    if not rows:
+        return []
+    lines = [f"- `{c}`: {_fmt(fill[c])} of {_fmt(rows)}" for c in FILL_COLUMNS if c in fill]
+    nt_p = [v for c, v in fill.items() if c.startswith("nt_p_")]
+    if nt_p:
+        lines.insert(3, f"- `nt_p_*` (any class): {_fmt(max(nt_p))} of {_fmt(rows)}")
+    return lines
+
+
 def render_card(spec: DatasetSpec, provenance: Mapping[str, Any], result: ExportResult) -> str:
     info = result.info
     meta = yaml.safe_dump(card_metadata(spec, result), sort_keys=False, allow_unicode=True)
@@ -192,7 +215,10 @@ def render_card(spec: DatasetSpec, provenance: Mapping[str, Any], result: Export
         f"| `{i.get('name')}` | {_fmt(int(i.get('bytes', 0)))} | `{i.get('sha256')}` |"
         for i in provenance.get("inputs", [])
     ]
-    first = result.tables[0].config if result.tables else "neurons"
+    configs = [t.config for t in result.tables]
+    first = "neurons" if "neurons" in configs or not configs else configs[0]
+    fill: Mapping[str, int] = info.get("neuron_fill", {})
+    fill_lines = _fill_lines(fill)
     lic_line = f"[{spec.license}]({spec.license_url})" if spec.license_url else spec.license
 
     body = [
@@ -236,6 +262,11 @@ def render_card(spec: DatasetSpec, provenance: Mapping[str, Any], result: Export
         "## Neurotransmitter predictions are predictions",
         "",
         NT_CAVEAT,
+        *(
+            ["", "Filled in this snapshot (non-null neurons):", "", *fill_lines]
+            if fill_lines
+            else []
+        ),
         "",
         "## Caveats",
         "",
@@ -264,9 +295,9 @@ def render_card(spec: DatasetSpec, provenance: Mapping[str, Any], result: Export
         "```python",
         "from datasets import load_dataset",
         "",
-        f'neurons = load_dataset("{result.repo_id}", "{first}", split="train")',
+        f'{first} = load_dataset("{result.repo_id}", "{first}", split="train")',
         "# or, from a local copy of this folder:",
-        f'neurons = load_dataset("parquet", data_files="data/{first}.parquet", split="train")',
+        f'{first} = load_dataset("parquet", data_files="data/{first}.parquet", split="train")',
         "```",
         "",
         "With flyconn installed, `flyconn data pull " + spec.ref + "` builds the same store "

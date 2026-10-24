@@ -28,6 +28,9 @@ def test_card_has_every_required_field(exported):
     assert "Berg S" in card and "10.1016/j.cell.2026.08.015" in card  # registry citation
     assert "pair_min_synapses" in card and "minconf" in card  # thresholds from provenance
     assert "classifier predictions" in card
+    assert "- `nt_p_*` (any class): 40 of 40" in card  # fill counts come from the data
+    assert "- `cell_type`: 35 of 40" in card
+    assert 'neurons = load_dataset("flyconn/malecns-1.0", "neurons"' in card
 
 
 def test_card_metadata_parses_as_hf_card(exported):

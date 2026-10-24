@@ -151,6 +151,7 @@ def export_store(
         "registry_ref": spec.ref,
         "repo_id": result.repo_id,
         "slices": slice_info,
+        "neuron_fill": _neuron_fill(store.root / "neurons.parquet"),
         "duckdb": {"memory_limit": memory_limit, "threads": threads},
         "seconds_total": round(time.perf_counter() - t_start, 2),
         "peak_rss_mb": _peak_rss_mb(),
@@ -297,6 +298,22 @@ def _types(
         "weight_total": int(total[0]),
         "edge_min_weight": 1,
     }
+
+
+def _neuron_fill(path: Path) -> dict[str, int]:
+    """Non-null count per column of the neuron table, plus ``rows`` (empty if absent)."""
+    if not path.exists():
+        return {}
+    names = pq.read_schema(path).names
+    counts = ", ".join(f'count("{c}")' for c in names)
+    con = duckdb.connect(database=":memory:")
+    try:
+        row = con.execute(f"SELECT count(*), {counts} FROM read_parquet('{_sql_path(path)}')")
+        values = row.fetchone()
+    finally:
+        con.close()
+    assert values is not None
+    return {"rows": int(values[0]), **{c: int(v) for c, v in zip(names, values[1:], strict=True)}}
 
 
 def _describe(out: Path, path: Path, config: str, seconds: float, source: str) -> ExportedTable:
