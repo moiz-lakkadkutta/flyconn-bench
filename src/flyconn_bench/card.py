@@ -174,11 +174,16 @@ FILL_COLUMNS: tuple[str, ...] = (
 )
 
 
-def _fill_lines(fill: Mapping[str, int]) -> list[str]:
+def _fill_lines(fill: Mapping[str, int], dataset: str) -> list[str]:
     rows = fill.get("rows")
     if not rows:
         return []
-    lines = [f"- `{c}`: {_fmt(fill[c])} of {_fmt(rows)}" for c in FILL_COLUMNS if c in fill]
+    own = f"{dataset}_"  # a dataset's cross-reference to itself is always empty
+    lines = [
+        f"- `{c}`: {_fmt(fill[c])} of {_fmt(rows)}"
+        for c in FILL_COLUMNS
+        if c in fill and not c.startswith(own)
+    ]
     nt_p = [v for c, v in fill.items() if c.startswith("nt_p_")]
     if nt_p:
         lines.insert(3, f"- `nt_p_*` (any class): {_fmt(max(nt_p))} of {_fmt(rows)}")
@@ -218,7 +223,7 @@ def render_card(spec: DatasetSpec, provenance: Mapping[str, Any], result: Export
     configs = [t.config for t in result.tables]
     first = "neurons" if "neurons" in configs or not configs else configs[0]
     fill: Mapping[str, int] = info.get("neuron_fill", {})
-    fill_lines = _fill_lines(fill)
+    fill_lines = _fill_lines(fill, spec.name)
     lic_line = f"[{spec.license}]({spec.license_url})" if spec.license_url else spec.license
 
     body = [
