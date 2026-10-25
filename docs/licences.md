@@ -1,8 +1,10 @@
 # Licences and redistribution terms (upload gate)
 
 **No dataset is uploaded unless its row says `cleared` and the owner has said yes to that
-upload.** Read 2026-10-24 from the URLs below. Exact quotes and the full research notes were
-collected by a research pass on the same day; the FlyWire, Zenodo and MaleCNS statements were
+upload.** The machine-readable copy is `src/flyconn_bench/licences.yaml`, which
+`flyconn-bench upload` enforces; change both together (a test checks they agree). Read
+2026-10-24 from the URLs below. Exact quotes and the full research notes were collected by a
+research pass on the same day; the FlyWire, Zenodo and MaleCNS statements were
 re-fetched and checked by hand. This is not legal advice.
 
 | Dataset | Licence (as stated by the source) | Source URLs | Mirroring / access terms | Status |

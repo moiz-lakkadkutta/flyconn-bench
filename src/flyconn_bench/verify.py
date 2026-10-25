@@ -7,6 +7,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
+import pyarrow as pa
 import pyarrow.parquet as pq
 
 from flyconn_bench.export import PROVENANCE, read_checksums, sha256_file
@@ -41,13 +42,19 @@ def verify_export(
         report.problems.append("checksums.sha256 and provenance.json list different files")
     for t in tables:
         path = out / t["path"]
+        before = len(report.problems)
         digest = sha256_file(path)
         if digest != checksums.get(t["path"]) or digest != t["sha256"]:
             report.problems.append(f"{t['path']}: SHA-256 mismatch ({digest})")
-        rows = pq.ParquetFile(path).metadata.num_rows
+        try:
+            rows = pq.ParquetFile(path).metadata.num_rows
+        except (OSError, pa.ArrowInvalid) as e:
+            report.problems.append(f"{t['path']}: unreadable Parquet ({e})")
+            continue
         if rows != t["rows"]:
             report.problems.append(f"{t['path']}: {rows} rows, provenance says {t['rows']}")
-        report.checked.append(f"{t['path']}: sha256 ok, {rows:,} rows")
+        if len(report.problems) == before:
+            report.checked.append(f"{t['path']}: sha256 ok, {rows:,} rows")
     if load:
         _round_trip(out, tables, report, deep=deep, cache_dir=cache_dir)
     return report

@@ -1,0 +1,41 @@
+# Machine-readable upload gate. Human-readable version with quotes and URLs: docs/licences.md
+# (tests/test_upload.py checks the two agree). A ref that is not listed here is never uploaded.
+# status: cleared | review | blocked. `licence` is what the source states and must equal the
+# flyconn registry's licence id for an upload to proceed.
+checked: "2026-10-24"
+datasets:
+  malecns@1.0:
+    doc_name: MaleCNS v1.0
+    status: cleared
+    licence: CC-BY-4.0
+    sources:
+      - https://male-cns.janelia.org
+  banc@888:
+    doc_name: BANC v888
+    status: cleared
+    licence: CC-BY-4.0
+    sources:
+      - https://doi.org/10.7910/DVN/7WTH1N
+  flywire@783:
+    doc_name: FlyWire / FAFB v783
+    status: blocked
+    licence: CC-BY-NC-4.0
+    reason: "Zenodo says CC BY 4.0; flywire.ai/guidelines and the FlyWire Principles say CC BY-NC 4.0."
+    sources:
+      - https://zenodo.org/records/10676866
+      - https://flywire.ai/guidelines
+      - https://edit.flywire.ai/principles.html
+  hemibrain@1.2.1:
+    doc_name: hemibrain v1.2.1
+    status: review
+    licence: CC-BY-4.0
+    reason: "The figshare record cited by the paper (v1.0 data) is labelled CC BY-NC 4.0."
+    sources:
+      - https://www.janelia.org/project-team/flyem/hemibrain
+  manc@1.2.1:
+    doc_name: MANC v1.2.1
+    status: review
+    licence: CC-BY-4.0
+    reason: "Store is built from sjcabs compiled files; v1.2.3 now exists on neuPrint."
+    sources:
+      - https://www.janelia.org/project-team/flyem/manc-connectome

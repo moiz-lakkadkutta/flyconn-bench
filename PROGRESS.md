@@ -2,6 +2,21 @@
 
 Read `PLAN.md` for scope. Newest entry first.
 
+## 2026-10-25: upload gate, dry run only (branch `m1-upload-gate`, PR into `main`)
+
+- GitHub remote is live (https://github.com/moiz-lakkadkutta/flyconn-bench, public, created by
+  the owner); `main` = the M0 commits. CI runs on PRs into `main`.
+- `src/flyconn_bench/licences.yaml` + `licences.py`: machine-readable licence gate (default deny).
+- `flyconn-bench upload DIR`: dry run that checks licence status, registry and card licence, the
+  flyconn version that built the store, checksums and stray files, then lists what would be sent.
+  `upload.upload()` (create repo + `upload_folder`, private by default) exists and is tested
+  against a fake API, but is not reachable from the CLI.
+- `verify` now reports an unreadable Parquet file instead of crashing.
+- Dry run on the cached exports: both **BLOCKED** because their stores were built by flyconn 0.3.0
+  (MaleCNS) and 0.1.0 (BANC). Rebuild with `flyconn data pull <ref> --force` (heavy; one dataset
+  at a time) before an approved upload.
+- Still pending with the owner: HF org, repo naming, any upload, FlyWire licence, PyPI.
+
 ## 2026-10-24: M0 basic implementation (branch `m0-export`, local commits only)
 
 Done:

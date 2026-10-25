@@ -5,8 +5,8 @@ Hugging Face-ready snapshots of the harmonized Drosophila connectomes produced b
 benchmark (cross-animal splits, baselines, leaderboard). See `PLAN.md` for scope and milestones
 and `PROGRESS.md` to resume.
 
-Status: **M0 (local only).** Nothing has been uploaded; no Hub org or repo exists yet. Uploads
-are gated by [`docs/licences.md`](docs/licences.md) and the owner's explicit approval.
+Status: **M0 done; M1 upload gate in progress (dry run only).** Nothing has been uploaded;
+no Hub org or repo exists yet. Uploads are gated by [`docs/licences.md`](docs/licences.md) and the owner's explicit approval.
 
 ## Install and check
 
@@ -37,6 +37,22 @@ in a fixed sort order, so re-running an export reproduces the same bytes.
 - `--slice types`: `cell_types` (neurons per type, most common `super_class`) and `type_edges`
   (synapses summed over all pairs of each type pair, `n_pairs`, `n_pre`, `n_post`,
   `weight_per_post`). Untyped neurons are left out; the card records how many.
+
+## Upload gate (dry run only)
+
+```bash
+flyconn-bench upload exports/malecns-1.0     # checks and lists; never uploads
+```
+
+`upload` refuses (exit 1, `BLOCKED: ...`) unless all of these hold:
+
+- the dataset is `cleared` in `src/flyconn_bench/licences.yaml` (the machine-readable copy of
+  `docs/licences.md`; a test keeps the two in step, and unlisted datasets are refused);
+- that licence equals flyconn's registry licence and the card's `license`;
+- the store was built by the installed flyconn minor version;
+- every checksum and row count verifies, and the folder holds only the export's own files.
+
+Uploading itself is not wired to the CLI; it waits for the owner's approval per dataset.
 
 ## Local dry run (2026-10-24)
 

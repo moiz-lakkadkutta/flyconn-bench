@@ -1,4 +1,4 @@
-"""``flyconn-bench`` command line: export and verify HF-ready snapshots (local only)."""
+"""``flyconn-bench`` command line: export, verify and plan uploads of HF-ready snapshots."""
 
 from __future__ import annotations
 
@@ -10,6 +10,7 @@ from flyconn.data.store import Store
 
 from flyconn_bench.export import export_store
 from flyconn_bench.slices import parse_slice
+from flyconn_bench.upload import plan_upload
 from flyconn_bench.verify import verify_export
 
 app = typer.Typer(no_args_is_help=True, add_completion=False, help=__doc__)
@@ -78,3 +79,26 @@ def verify(
     if not report.ok:
         raise typer.Exit(1)
     typer.echo("ok")
+
+
+@app.command()
+def upload(
+    out: Annotated[Path, typer.Argument(help="Export folder")],
+    repo_id: Annotated[
+        str | None, typer.Option(help="Hub repo id (default: from the export)")
+    ] = None,
+) -> None:
+    """Dry run: check the licence gate and the export, and list what would be uploaded.
+
+    Uploading itself is not enabled yet; it needs the owner's approval per dataset.
+    """
+    plan = plan_upload(out, repo_id=repo_id)
+    typer.echo(f"dataset {plan.ref} -> https://huggingface.co/datasets/{plan.repo_id} (dry run)")
+    for rel, size in plan.files:
+        typer.echo(f"  {rel:<34} {size / 1e6:>9.1f} MB")
+    typer.echo(f"  total {plan.total_bytes / 1e6:.1f} MB; commit message: {plan.commit_message}")
+    for p in plan.problems:
+        typer.echo(f"BLOCKED: {p}", err=True)
+    if not plan.ok:
+        raise typer.Exit(1)
+    typer.echo("ready (nothing was uploaded)")
